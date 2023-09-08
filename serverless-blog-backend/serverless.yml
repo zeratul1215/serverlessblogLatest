@@ -1,0 +1,34 @@
+org: zeratul
+app: serverless-blog
+service: serverless-blog
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment: 
+    # DB
+    DB_HOST_END_NAME: my-blog.cuuvsmferzqo.us-east-2.rds.amazonaws.com
+    DB_USERNAME: admin
+    DB_PWD: yl001215th
+    DB_NAME: blog_2023
+    DB_PORT: 3306
+    DB_DIALECT: mysql
+    # JWT
+    JWT_SECRET: blog_jwt_2023_secret
+    # AWS
+    BUCKET_NAME: blog-articles-2023
+    ACCESSKEY: AKIA2M2PXW66UGKV3N6M
+    SECRETKEY: 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
+    REGION: us-east-2
+    
+
+    
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi: '*'
+	
+plugins:
+  - serverless-offline
