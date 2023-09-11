@@ -1,5 +1,6 @@
 import React,{useRef, useState} from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import defaultAvatar from "../../resources/avatar/avatar.jpg";
 
@@ -10,8 +11,8 @@ const Register = () =>{
 
     const gradientStyle = {
         height: "100vh",
-        background: "linear-gradient(to top right, #f0f0f0, #333333)",
-      };
+        background: "linear-gradient(to bottom, white, #FFEDCC)",
+    };
 
     const usernameRef = useRef("");
     const passwordRef = useRef("");
@@ -20,10 +21,12 @@ const Register = () =>{
     const [isOpen,setIsOpen] = useState(false);
     const [avatar,setAvatar] = useState(null);
     
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleRegister = async() => {
         
+
         const register = new Promise((resolve,reject) => {
             let reqBody = {
                 user:{
@@ -45,9 +48,7 @@ const Register = () =>{
                 const reader = new FileReader();
     
                 reqBody.user.avatar = {};
-    
-                // reqBody.user.avatar = avatar
-                // resolve(reqBody);
+
                 reader.onload = function(){
                     reqBody.user.avatar.base64 = reader.result.split(",")[1];
                     reqBody.user.avatar.format = reader.result.split(",")[0];
@@ -58,7 +59,6 @@ const Register = () =>{
             }
     
         }).then(data => {
-            //console.log(JSON.stringify(data));
             fetch(config.HOST_NAME+"/user/create",{
                 method: 'POST',
                 headers: {
@@ -71,14 +71,34 @@ const Register = () =>{
                 if(data.message != "create successful"){
                     throw new Error(data.message);
                 }
-                //console.log("abc")
                 localStorage.setItem('blogToken',data.data.token);
+                if(avatar){
+                    dispatch({
+                        type: "LOGIN",
+                        payload:{
+                            username:usernameRef.current.value,
+                            email:emailRef.current.value,
+                            password:passwordRef.current.value,
+                            bio:bioRef.current.value,
+                            avatar:URL.createObjectURL(avatar)
+                        }
+                    });
+                }
+                else{
+                    dispatch({
+                        type: "LOGIN",
+                        payload:{
+                            username:usernameRef.current.value,
+                            email:emailRef.current.value,
+                            password:passwordRef.current.value
+                        }
+                    });
+                }
                 setTimeout(() => {
                     navigate("/home");
                 }, 3000);
                 setIsOpen(true);
             }).catch(error => {
-                //console.log(error);
                 alert(error);
             });
         });
@@ -94,7 +114,9 @@ const Register = () =>{
             <div className="row justify-content-center">
                 <div className="col-md-6"
                     style={{
-                        marginTop:'60px'
+                        display:'flex',
+                        justifyContent:'center',
+                        alignItems:'center', minHeight: '80vh'
                     }}
                 >
                 <div className="card">

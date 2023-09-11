@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import defaultAvatar from "../../resources/avatar/avatar.jpg";
 import config from "../../config/config";
@@ -11,21 +13,72 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showWriteArticle, setShowWriteArticle] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [test,setTest] = useState(true);
+  const login = useSelector((state) => state.login);
+  const userAvatar = useSelector((state) => state.avatar);
   const [prevPageArticles,setPrevPageArticles] = useState(20);
   const userMenuRef = useRef(null);
   const avatarRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const gradientStyle = {
     height: "100vh",
     display: "flex",
     padding: "20px",
     flexDirection:'column',
-    background: "linear-gradient(to bottom left, #f0f0f0, #333333)",
+    background: "linear-gradient(to bottom, white, #FFEDCC)",
   };
 
-  
+  const autoLogin = async () => {
+    console.log(userAvatar);
+    if(login){
+      return;
+    }
+    const token = localStorage.getItem('blogToken');
+    if(token){
+      console.log('token fetch success');//
+      const response = await fetch(config.HOST_NAME + `/user/login`,{
+        method:'POST',
+        headers:{
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      const avatarURL = data.data.avatar;
+      try{
+        await fetch(avatarURL).then((response) => {
+          if(!response.ok){
+            throw new Error('Network Error');
+          }
+          return response.blob();
+        }).then(blob => {
+          const imageURL = URL.createObjectURL(blob);
+          return imageURL;
+        }).then((imageURL)=>{
+          dispatch({
+            type:"LOGIN",
+            payload:{
+              username:data.data.username,
+              email:data.data.email,
+              avatar:imageURL,
+              bio:data.data.bio
+            }
+          });
+        });
+        
+      }
+      catch(err){
+        console.log(err);
+      }
+      //header: Authorization:Bearer +'token'
+    }
+    else{
+      const avatarElement = document.getElementById("avatar");
+      avatarElement.style.backgroundImage = `url(${defaultAvatar})`;
+    }
+  }
+
 
   const loadMoreArticles = async () => {
     if(prevPageArticles != 20){
@@ -63,11 +116,20 @@ const Home = () => {
   }
 
   const logout = ()=>{
-    alert("logout");
+    localStorage.removeItem('blogToken');
+    dispatch({
+      type:"LOGOUT"
+    });
+    window.location.reload();
+  }
+
+  const jumpLogin = () => {
+    navigate("/login");
   }
 
   // Simulate fetching articles from backend
   useEffect(() => {
+    autoLogin();
     fetchArticles();
   }, []);
 
@@ -125,12 +187,14 @@ const Home = () => {
         <div
           ref = {avatarRef}
           className="rounded-circle"
+          id = "avatar"
           style={{
             display:'flex',
             flexGrow:2,
             width: "74px",
             height: "74px",
-            backgroundImage: `url(${defaultAvatar})`,
+            //backgroundImage: userAvatar == null ? `url(${defaultAvatar})`: userAvatar,
+            backgroundImage: `url(${userAvatar})`,
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
@@ -152,7 +216,14 @@ const Home = () => {
               >
               <div className="p-2 selectionTab" onClick={()=>navigate("/user-profile")}>查看用户信息</div>
               <div className="p-2 selectionTab" onClick={()=>navigate("/change-password")}>修改密码</div>
-              <div className="p-2 selectionTab" onClick={()=>logout()}>登出</div>
+              {
+                login? (
+                  <div className="p-2 selectionTab" onClick={()=>logout()}>log out</div>
+                ):(
+                  <div className="p-2 selectionTab" onClick={()=>jumpLogin()}>log in</div>
+                )
+              }
+              
             </div>
           )}
         </div>
@@ -196,7 +267,11 @@ const Home = () => {
       {/* Article List or Write Article */}
       {showWriteArticle ? (
         <div className="d-flex justify-content-center align-items-center" style={{ height: "500px" }}>
-          <h1>Hello World! This is the Write Article Page</h1>
+          {login?(
+            <h1>Hello World! This is the Write Article Page</h1>
+          ):(
+            <h1>you need to login</h1>
+          )}
         </div>
       ) : (
         
@@ -282,7 +357,9 @@ const Home = () => {
               marginTop:'10px'
             }}
           >
-            <button onClick={loadMoreArticles} className="btn btn-primary">
+            <button onClick={loadMoreArticles} className="btn btn-primary"
+              //disabled={prevPageArticles==20?true:false}
+            >
               Get More Articles
             </button>
           </div>
