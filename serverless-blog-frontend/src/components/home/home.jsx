@@ -297,7 +297,7 @@ const Home = () => {
                   >
                     {/* Article Title */}
                     <h3 className="browseTitle" style={{ marginTop: "0", marginBottom: "10px" }}
-                      onClick={()=>navigate("/")}
+                      onClick={()=>navigate(`/article/${article.slug}`)}
                     >
                       {article.title}
                     </h3>

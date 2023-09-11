@@ -268,6 +268,8 @@ module.exports.getArticleContent = async (req,res,next) => {
     try{
         let slug = req.params.slug;
 
+        console.log(slug);
+
         let article = await Article.findByPk(slug);
         
         if(!article){

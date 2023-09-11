@@ -6,18 +6,27 @@ import defaultAvatar from "../../resources/avatar/avatar.jpg";
 import config from "../../config/config";
 import "../css/global.css";
 import { Button, Modal} from "react-bootstrap";
+import { Nav, NavItem } from "react-bootstrap"; 
 
 const UserProfile = () => {
 
-    const avatarRef = useRef(null);
+    //const avatarRef = useRef(null);
+    const login = useSelector(state => state.login);
     const userAvatar = useSelector((state) => state.avatar);
     const username = useSelector((state) => state.username);
     const bio = useSelector((state)=>state.bio);
     const changeNameRef = useRef("");
     const changeBioRef = useRef("");
+    const avatarInputRef = useRef(null);
     const [showchangeUsername,setShowChangeUserName] = useState(false);
     const [showchangeBio,setShowChangeBio] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [originalAvatar, setOriginalAvatar] = useState(userAvatar);
+    const [originalUsername,setOriginalUsername] = useState(username);
+    const [originalBio,setOriginalBio] = useState(bio);
+
+
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -36,7 +45,8 @@ const UserProfile = () => {
     }
 
     const editProfileFigure = () =>{
-        
+        const element = avatarInputRef.current;
+        element.click();
     }
 
 
@@ -67,7 +77,19 @@ const UserProfile = () => {
 
 
     return (
-        <div style={gradientStyle}>
+        <div variant="pills" style={gradientStyle}>
+            <Nav>
+                <NavItem>
+                    <Nav.Link eventKey = "home" onClick={() => navigate("/home")}
+                        style={{
+                            border:"1px solid",
+                            borderRadius:'5px'
+                        }}
+                    >
+                        home
+                    </Nav.Link>
+                </NavItem>
+            </Nav>
             <div className="container-fluid" 
                 style={{
                     justifyContent:'center',
@@ -99,7 +121,7 @@ const UserProfile = () => {
                 >
                     {/* Avatar */}
                     <div
-                        ref = {avatarRef}
+                        //ref = {avatarRef}
                         className="rounded-circle"
                         style={{
                             display:'flex',
@@ -113,6 +135,22 @@ const UserProfile = () => {
                             cursor: "pointer", // Add cursor pointer for the avatar
                         }}
                     >
+                        <input
+                            type="file"
+                            style={{
+                                display:"none"
+                            }}
+                            ref = {avatarInputRef}
+                            onChange={e => {
+                                const file = e.target.files[0];
+                                dispatch({
+                                    type:"LOGIN",
+                                    payload:{
+                                        avatar:URL.createObjectURL(file)
+                                    }
+                                })
+                            }}
+                        ></input>
                         <div
                             className="rounded-circle"
                             style={{

@@ -3,6 +3,7 @@ import {BrowserRouter,Routes,Route} from "react-router-dom";
 import Login from "./components/userLoginRegister/login";
 import Home from "./components/home/home";
 import Register from "./components/userLoginRegister/register";
+import Article from "./components/article/article";
 import UserProfile from "./components/userInfo/profile";
 import { Provider } from "react-redux";
 import store from "./components/reduxStore/store"
@@ -16,6 +17,7 @@ function App() {
             <Route path = "/register" element = {<Register/>}/>
             <Route path = "/home" element = {<Home/>}/>
             <Route path = "/user-profile" element = {<UserProfile/>}/>
+            <Route path = "/article/:slug" element = {<Article/>}/>
         </Routes>
       </BrowserRouter>
     </Provider>

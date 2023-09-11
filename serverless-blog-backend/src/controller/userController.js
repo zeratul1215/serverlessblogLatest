@@ -205,6 +205,20 @@ module.exports.createUser = async(req,res,next) => {
     }
 }
 
+module.exports.getAuthorInfo = async(req,res,next) => {
+    try{
+        let email = req.params.email;
+
+        let user = await User.findByPk(email);
+        if(!user){
+            next(new HttpException(402,"author's account has been deleted));
+        }
+    }
+    catch(error){
+        next(error);
+    }
+}
+
 module.exports.getUser = async(req,res,next) => {
     try{
         let {email} = req.body.user;
