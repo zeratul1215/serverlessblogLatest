@@ -113,21 +113,16 @@ const Home = () => {
       }
     });
     const data = await response.json();
-    const authorResponse = await fetch(config.HOST_NAME + `/user/getUser`,{
+    const authorResponse = await fetch(config.HOST_NAME + `/user/getAuthorInfo/${data.data.author}`,{
       method:'GET',
       headers:{
         'Content-Type': 'application/json'
-      },
-      body:{
-        user:{
-          email:data.data.author
-        }
       }
     });
-    const userdata = await authorResponse.json();
-    console.log(userdata);
+    const authorData = await authorResponse.json();
+    
     setTitle(data.data.title);
-    setAuthor(data.data.author);
+    setAuthor(authorData.data.username);
     const contentUrl = data.data.s3_URL;
     await fetch(contentUrl).then((response)=> {
       if(!response.ok){
@@ -230,7 +225,11 @@ const Home = () => {
           )}
         </div>
       </div>
-      <div>
+      <div 
+        style={{
+          marginTop:"50px"
+        }}
+      >
         <h2>{title}</h2>
         <h4>{author}</h4>
         <div dangerouslySetInnerHTML={{__html:htmlContent}}></div>

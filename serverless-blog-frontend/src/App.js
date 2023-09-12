@@ -8,6 +8,8 @@ import UserProfile from "./components/userInfo/profile";
 import { Provider } from "react-redux";
 import store from "./components/reduxStore/store"
 
+import Marked from "./components/test/markdown";
+
 function App() {
   return (
     <Provider store={store}>
@@ -18,6 +20,7 @@ function App() {
             <Route path = "/home" element = {<Home/>}/>
             <Route path = "/user-profile" element = {<UserProfile/>}/>
             <Route path = "/article/:slug" element = {<Article/>}/>
+            <Route path = "/textEditor" element = {<Marked/>}/>
         </Routes>
       </BrowserRouter>
     </Provider>

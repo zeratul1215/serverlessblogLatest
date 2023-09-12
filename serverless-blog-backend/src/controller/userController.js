@@ -213,8 +213,18 @@ module.exports.getAuthorInfo = async(req,res,next) => {
         if(!user){
             next(new HttpException(402,"author's account has been deleted"));
         }
-
         
+        const dataReply = {
+            email:user.dataValues.email,
+            username:user.dataValues.username,
+            avatar:user.dataValues.avatar
+        }
+
+        //console.log(user);
+        res.json({
+            data:dataReply,
+            message:"ok"
+        });
 
         
     }
