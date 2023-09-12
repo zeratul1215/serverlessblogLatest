@@ -211,8 +211,12 @@ module.exports.getAuthorInfo = async(req,res,next) => {
 
         let user = await User.findByPk(email);
         if(!user){
-            next(new HttpException(402,"author's account has been deleted));
+            next(new HttpException(402,"author's account has been deleted"));
         }
+
+        
+
+        
     }
     catch(error){
         next(error);
