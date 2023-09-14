@@ -8,6 +8,8 @@ const Marked = () => {
 
     const [text, setText] = useState('');
 
+    
+
     //config the highlight and marked
     useEffect(() => {
         hljs.configure({
@@ -34,11 +36,18 @@ const Marked = () => {
             {/* <header>markdown realtime editor</header> */}
             <div className='toolbar'>
                 <button onClick={handleInsertImage}>插入图片</button>
+                <input type='file' id="imageInput"
+                    style={{
+                        display:false
+                    }}
+                ></input>
             </div>
+            
             <div className='marked'>
                 
                 <div
                     className='input-region markdownStyle'
+                    id='editableDiv'
                     contentEditable="true"
                     onInput={e => {
                         setText(e.target.innerText);
